@@ -2536,14 +2536,18 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule):
         try:
             current_url = self.get_module_option_ex('dashboard',
                                                     'GRAFANA_API_URL')
-            if grafanas:
-                host = grafanas[0].hostname
-                url = 'https://%s:3000' % (self.inventory[host].get('addr',
-                                                                    host))
-                if current_url != url:
-                    self.log.info('Setting dashboard grafana config to %s' % url)
-                    self.set_module_option_ex('dashboard', 'GRAFANA_API_URL',
-                                              url)
+            last_set_url = self.get_store('GRAFANA_ORCHESTRATOR_API_URL')
+
+            if current_url == '' or current_url == last_set_url:
+                if grafanas:
+                    host = grafanas[0].hostname
+                    url = 'https://%s:3000' % (self.inventory[host].get('addr',
+                                                                        host))
+                    if current_url != url:
+                        self.log.info('Setting dashboard grafana config to %s' % url)
+                        self.set_module_option_ex('dashboard', 'GRAFANA_API_URL',
+                                                url)
+                        self.set_store('GRAFANA_ORCHESTRATOR_API_URL', url)
                     # FIXME: is it a signed cert??
         except Exception as e:
             self.log.debug('got exception fetching dashboard grafana state: %s',

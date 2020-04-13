@@ -627,12 +627,6 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule):
             'default': '/etc/prometheus/ceph/ceph_default_alerts.yml',
             'desc': 'location of alerts to include in prometheus deployments',
         },
-        {
-            'name': 'CONTROL_GRAFANA_API_URL',
-            'type': 'bool',
-            'default': True,
-            'desc': 'cephadm in control of GRAFANA_API_URL',
-        },
     ]
 
     def __init__(self, *args, **kwargs):
@@ -1518,7 +1512,7 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule):
                 if item.startswith('host %s ' % host):
                     self.event.set()
         return 0, '%s (%s) ok' % (host, addr), err
-    
+
     def _get_connection(self, host):
         """
         Setup a connection for running commands on remote host.
@@ -2539,21 +2533,22 @@ class CephadmOrchestrator(orchestrator.Orchestrator, MgrModule):
                                     dd.hostname, reconfig=True)
 
         # make sure the dashboard [does not] references grafana
-        control = self.get_module_option('CONTROL_GRAFANA_API_URL')
-        if control == None or control:
-            try:
-                current_url = self.get_module_option_ex('dashboard',
-                                                        'GRAFANA_API_URL')
-                if grafanas:
-                    host = grafanas[0].hostname
-                    url = 'https://%s:3000' % (self.inventory[host].get('addr',
-                                                                        host))
+        
+        try:
+            current_url = self.get_module_option_ex('orchestrator',
+                                                    'GRAFANA_API_URL')
+            if grafanas:
+                host = grafanas[0].hostname
+                url = 'https://%s:3000' % (self.inventory[host].get('addr',
+                                                                    host))
+
+                if current_url != url:
                     self.log.info('Setting dashboard grafana config to %s' % url)
-                    self.set_module_option_ex('dashboard', 'GRAFANA_API_URL',
+                    self.set_module_option_ex('orchestrator', 'GRAFANA_API_URL',
                                                 url)
-                    # FIXME: is it a signed cert??
-            except Exception as e:
-                self.log.debug('got exception fetching dashboard grafana state: %s',
+                # FIXME: is it a signed cert??
+        except Exception as e:
+            self.log.debug('got exception fetching dashboard grafana state: %s',
                             e)
 
     def _add_daemon(self, daemon_type, spec,

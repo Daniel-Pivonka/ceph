@@ -55,6 +55,12 @@ class OrchestratorCli(OrchestratorClientMixin, MgrModule):
                              'test_orchestrator'],
             'runtime': True,
         },
+        {
+            'name': 'GRAFANA_API_URL',
+            'type': 'str',
+            'default': None,
+            'desc': 'Orchestrator Grafana API URL',
+        },
     ]
     NATIVE_OPTIONS = []  # type: List[dict]
 

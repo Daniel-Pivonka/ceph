@@ -190,7 +190,7 @@ def options_schema_list():
     return result
 
 
-def handle_option_command(self, cmd):
+def handle_option_command(cmd):
     if cmd['prefix'] not in _OPTIONS_COMMAND_MAP:
         return -errno.ENOSYS, '', "Command not found '{}'".format(cmd['prefix'])
 
@@ -203,10 +203,6 @@ def handle_option_command(self, cmd):
     elif cmd['prefix'].startswith('dashboard get'):
         return 0, str(getattr(Settings, opt['name'])), ''
     elif cmd['prefix'].startswith('dashboard set'):
-        if opt['name'] == 'GRAFANA_API_URL':
-            if self.get_module_option_ex('orchestrator', 'orchestrator') == 'cephadm':
-                self.set_module_option_ex('cephadm', 'CONTROL_GRAFANA_API_URL', False)
-
         value = opt['type'](cmd['value'])
         if opt['type'] == bool and cmd['value'].lower() == 'false':
             value = False

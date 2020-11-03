@@ -14,6 +14,7 @@ logger = logging.getLogger(__name__)
 class HA_RGWService(CephService):
     TYPE = 'HA_RGW'
 
+
 class HAproxyService(CephService):
     TYPE = 'haproxy'
 
@@ -33,7 +34,8 @@ class HAproxyService(CephService):
         rgw_daemons = self.mgr.cache.get_daemons_by_service('rgw')
         rgw_servers = []
         for daemon in rgw_daemons:
-            rgw_servers.append(self.rgw_server(daemon.hostname, self.mgr.inventory.get_addr(daemon.hostname)))
+            rgw_servers.append(self.rgw_server(
+                daemon.hostname, self.mgr.inventory.get_addr(daemon.hostname)))
 
         ha_context = {'spec': spec, 'rgw_servers': rgw_servers}
 
@@ -50,6 +52,7 @@ class HAproxyService(CephService):
         logger.info('Create daemon %s on host %s with spec %s' % (
             daemon_id, host, spec))
         return daemon_spec
+
 
 class KeepAlivedService(CephService):
     TYPE = 'keepalived'

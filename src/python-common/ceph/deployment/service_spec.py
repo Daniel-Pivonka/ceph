@@ -811,7 +811,7 @@ class HA_RGWSpec(ServiceSpec):
         self.ha_proxy_enable_prometheus_exporter = ha_proxy_enable_prometheus_exporter
         self.ha_proxy_monitor_uri = ha_proxy_monitor_uri
         self.keepalived_password = keepalived_password
-
+        self.definitive_host_list = None
 
     def validate(self):
         super(HA_RGWSpec, self).validate()

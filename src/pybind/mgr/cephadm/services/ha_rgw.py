@@ -31,11 +31,12 @@ class HAproxyService(CephService):
         host = daemon_spec.host
         spec = daemon_spec.spec
 
-        rgw_daemons = self.mgr.cache.get_daemons_by_service('rgw')
+        rgw_daemons = self.mgr.cache.get_daemons_by_type('rgw')
+
         rgw_servers = []
         for daemon in rgw_daemons:
             rgw_servers.append(self.rgw_server(
-                daemon.hostname, self.mgr.inventory.get_addr(daemon.hostname)))
+                daemon.name(), utils.resolve_ip(daemon.hostname)))
 
         ha_context = {'spec': spec, 'rgw_servers': rgw_servers}
 
@@ -65,9 +66,25 @@ class KeepAlivedService(CephService):
         host = daemon_spec.host
         spec = daemon_spec.spec
 
-        ka_context = {'spec': spec, 'state': 'MASTER',
-                      'other_ips': [],
-                      'host_ip': self.mgr.inventory.get_addr(host)}
+        all_hosts = []
+        for h, network, name in spec.definitive_host_list:
+            all_hosts.append(h)
+
+        #set state. first host in placement is master all others backups
+        state = 'BACKUP'
+        if all_hosts[0] == host:
+            state = 'MASTER'
+
+        #remove host, daemon is being deployed on from all_hosts list for other_ips in conf file and converter to ips
+        all_hosts.remove(host)
+        other_ips = [utils.resolve_ip(h) for h in all_hosts]
+
+        logger.info("DPIVONKA all hosts %s" % all_hosts)
+
+
+        ka_context = {'spec': spec, 'state': state,
+                      'other_ips': other_ips,
+                      'host_ip': utils.resolve_ip(host)}
 
         keepalive_conf = self.mgr.template.render(
             'services/keepalived/keepalived.conf.j2', ka_context)

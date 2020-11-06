@@ -497,6 +497,7 @@ class CephadmServe:
                 # HA_RGW needs to deploy 2 daemons
                 if daemon_type == 'HA_RGW':
                     daemon_spec.daemon_type = 'haproxy'
+                    daemon_spec.spec.definitive_host_list = hosts
                     daemon_spec = self.mgr.cephadm_services['haproxy'].prepare_create(daemon_spec)
                     self.mgr._create_daemon(daemon_spec)
                     daemon_spec.daemon_type = 'keepalived'

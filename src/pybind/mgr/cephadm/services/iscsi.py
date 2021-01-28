@@ -5,7 +5,7 @@ from typing import List, cast
 from mgr_module import MonCommandFailed
 from ceph.deployment.service_spec import IscsiServiceSpec
 
-from orchestrator import DaemonDescription, OrchestratorError
+from orchestrator import DaemonDescription, DaemonDescriptionStatus
 from .cephadmservice import CephadmDaemonSpec, CephService
 from .. import utils
 

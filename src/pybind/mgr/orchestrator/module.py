@@ -20,7 +20,7 @@ from ._interface import OrchestratorClientMixin, DeviceLightLoc, _cli_read_comma
     raise_if_exception, _cli_write_command, TrivialReadCompletion, OrchestratorError, \
     NoOrchestrator, OrchestratorValidationError, NFSServiceSpec, HA_RGWSpec, \
     RGWSpec, InventoryFilter, InventoryHost, HostSpec, CLICommandMeta, \
-    ServiceDescription, DaemonDescription, IscsiServiceSpec, json_to_generic_spec, GenericSpec
+    ServiceDescription, DaemonDescription, DaemonDescriptionStatus, IscsiServiceSpec, json_to_generic_spec, GenericSpec
 
 
 def nice_delta(now: datetime.datetime, t: Optional[datetime.datetime], suffix: str = '') -> str:
@@ -645,9 +645,9 @@ class OrchestratorCli(OrchestratorClientMixin, MgrModule,
                     status = s.status_desc
                 else:
                     status = {
-                        -1: 'error',
-                        0: 'stopped',
-                        1: 'running',
+                        DaemonDescriptionStatus.error: 'error',
+                        DaemonDescriptionStatus.stopped: 'stopped',
+                        DaemonDescriptionStatus.running: 'running',
                         None: '<unknown>'
                     }[s.status]
                 if s.status == 1 and s.started:
